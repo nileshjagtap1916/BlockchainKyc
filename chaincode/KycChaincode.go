@@ -112,15 +112,15 @@ func (t *KycChaincode) GetKycDetails(stub shim.ChaincodeStubInterface, UserPanNu
 	if err != nil {
 		return nil, errors.New("Failed to get Merchant Transactions")
 	}
-	var KycTxObject KycData
-	json.Unmarshal(KycTxAsBytes, &KycTxObject)
-	fmt.Printf("Output from chaincode: %s\n", KycTxObject)
+	//var KycTxObject KycData
+	//json.Unmarshal(KycTxAsBytes, &KycTxObject)
+	//fmt.Printf("Output from chaincode: %s\n", KycTxObject)
 
 	//res, err := json.Marshal(KycTxAsBytes)
 	//if err != nil {
 	//return nil, errors.New("Failed to Marshal the required Obj")
 	//}
-	return KycTxObject, nil
+	return KycTxAsBytes, nil
 
 }
 
