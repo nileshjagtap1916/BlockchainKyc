@@ -116,11 +116,11 @@ func (t *KycChaincode) GetKycDetails(stub shim.ChaincodeStubInterface, UserPanNu
 	json.Unmarshal(KycTxAsBytes, &KycTxObject)
 	fmt.Printf("Output from chaincode: %s\n", KycTxObject)
 
-	res, err := json.Marshal(KycTxAsBytes)
-	if err != nil {
-		return nil, errors.New("Failed to Marshal the required Obj")
-	}
-	return res, nil
+	//res, err := json.Marshal(KycTxAsBytes)
+	//if err != nil {
+	//return nil, errors.New("Failed to Marshal the required Obj")
+	//}
+	return KycTxObject, nil
 
 }
 
