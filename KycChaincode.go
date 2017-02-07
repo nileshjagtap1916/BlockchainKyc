@@ -40,7 +40,7 @@ func (t *KycChaincode) Init(stub shim.ChaincodeStubInterface, function string, a
 		&shim.ColumnDefinition{Name: "USER_KYC_PDF", Type: shim.ColumnDefinition_STRING, Key: false},
 	})
 	if err != nil {
-		return shim.Error("Failed creating tblKycDetails table.")
+		return nil, fmt.Errorf("Failed creating tblKycDetails table, [%v]", err)
 	}
 
 	return nil, nil
