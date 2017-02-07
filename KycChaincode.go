@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 
@@ -70,7 +71,7 @@ func (t *KycChaincode) InsertKycDetails(stub shim.ChaincodeStubInterface, args [
 	var UserKycDoc string
 
 	if len(args) != 3 {
-		return nil, errors.New("Incorrect number of arguments. Need 14 arguments")
+		return nil, errors.New("Incorrect number of arguments. Need 3 arguments")
 	}
 
 	// Initialize the chaincode
@@ -115,15 +116,17 @@ func (t *KycChaincode) Query(stub shim.ChaincodeStubInterface, function string, 
 		return nil, errors.New(jsonResp)
 	}
 
-	if len(row.Columns) == 0 {
+	/*if len(row.Columns) == 0 {
 		jsonResp := "{\"Error\":\"no data present for " + UserPanNumber + " on blockchain. \"}"
 		return nil, errors.New(jsonResp)
-	}
+	}*/
 
-	jsonResp := "{\"KYC_DOC\":\"" + string(row.Columns[2].GetBytes()) + "\"}"
+	jsonResp := "{\"KYC_DOC\":\"" + row.Columns[2].GetString_() + "\"}"
 	fmt.Printf("Query Response:%s\n", jsonResp)
 
-	return row.Columns[2].GetBytes(), nil
+	res, _ := json.Marshal(row)
+
+	return res, nil
 }
 
 func main() {
