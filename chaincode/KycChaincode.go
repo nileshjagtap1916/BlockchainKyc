@@ -3,11 +3,8 @@ package main
 import (
 	"errors"
 	"fmt"
-	//"strconv"
-	"encoding/json"
 
 	"github.com/hyperledger/fabric/core/chaincode/shim"
-	//"github.com/golang/protobuf/ptypes/timestamp"
 )
 
 // Region Chaincode implementation
@@ -16,11 +13,11 @@ type KycChaincode struct {
 
 var KycIndexTxStr = "_KycIndexTxStr"
 
-type KycData struct {
+/*type KycData struct {
 	USER_PAN_NO  string `json:"USER_PAN_NO"`
 	USER_NAME    string `json:"USER_NAME"`
 	USER_KYC_PDF string `json:"USER_KYC_PDF"`
-}
+}*/
 
 func (t *KycChaincode) Init(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
 
@@ -29,11 +26,21 @@ func (t *KycChaincode) Init(stub shim.ChaincodeStubInterface, function string, a
 
 	fmt.Printf("Deployment of KYC is completed\n")
 
-	var EmptyKYC KycData
+	/*var EmptyKYC KycData
 	jsonAsBytes, _ := json.Marshal(EmptyKYC)
 	err = stub.PutState(KycIndexTxStr, jsonAsBytes)
 	if err != nil {
 		return nil, err
+	}*/
+
+	// Create ownership table
+	err = stub.CreateTable("tblKycDetails", []*shim.ColumnDefinition{
+		&shim.ColumnDefinition{Name: "USER_PAN_NO", Type: shim.ColumnDefinition_STRING, Key: true},
+		&shim.ColumnDefinition{Name: "USER_NAME", Type: shim.ColumnDefinition_BYTES, Key: false},
+		&shim.ColumnDefinition{Name: "USER_KYC_PDF", Type: shim.ColumnDefinition_STRING, Key: false},
+	})
+	if err != nil {
+		return shim.Error("Failed creating tblKycDetails table.")
 	}
 
 	return nil, nil
@@ -41,18 +48,26 @@ func (t *KycChaincode) Init(stub shim.ChaincodeStubInterface, function string, a
 
 // Add user KYC data in Blockchain
 func (t *KycChaincode) Invoke(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
-	if function == KycIndexTxStr {
-		return t.RegisterKYC(stub, args)
+
+	// Handle different functions
+	if function == "InsertKycDetails" {
+		// Insert User's KYC data in blockchain
+		return t.InsertKycDetails(stub, args)
 	}
-	return nil, nil
+	/*else if function == "UpdateKycDetails" {
+		// Update User's KYC data in blockchain
+		return t.UpdateKycDetails(stub, args)
+	}*/
+
+	return nil, errors.New("Received unknown function invocation")
 }
 
-func (t *KycChaincode) RegisterKYC(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
-
-	var KycDataObj KycData
-	//var KycDataList []KycData
+func (t *KycChaincode) InsertKycDetails(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 	var err error
+	var ok bool
 	var UserPanNumber string
+	var UserName string
+	var UserKycDoc string
 
 	if len(args) != 3 {
 		return nil, errors.New("Incorrect number of arguments. Need 14 arguments")
@@ -60,24 +75,21 @@ func (t *KycChaincode) RegisterKYC(stub shim.ChaincodeStubInterface, args []stri
 
 	// Initialize the chaincode
 	UserPanNumber = args[0]
-	KycDataObj.USER_NAME = args[1]
-	KycDataObj.USER_KYC_PDF = args[2]
+	UserName = args[1]
+	UserKycDoc = args[2]
 
-	fmt.Printf("Input from user:%s\n", KycDataObj)
+	ok, err = stub.InsertRow("tblKycDetails", shim.Row{
+		Columns: []*shim.Column{
+			&shim.Column{Value: &shim.Column_String_{String_: UserPanNumber}},
+			&shim.Column{Value: &shim.Column_String_{String_: UserName}},
+			&shim.Column{Value: &shim.Column_String_{String_: UserKycDoc}}},
+	})
 
-	//regionTxsAsBytes, err := stub.GetState(UserPanNumber)
-	//if err != nil {
-	//return nil, errors.New("Failed to get consumer Transactions")
-	//}
-	//json.Unmarshal(regionTxsAsBytes, &KycDataObj)
-
-	//KycDataList = append(KycDataList, KycDataObj)
-	jsonAsBytes, _ := json.Marshal(KycDataObj)
-
-	err = stub.PutState(UserPanNumber, jsonAsBytes)
-	if err != nil {
-		return nil, err
+	if !ok && err == nil {
+		fmt.Println("Error inserting row")
+		return nil, errors.New("Kyc Details already on blockchain.")
 	}
+
 	return nil, nil
 }
 
@@ -85,7 +97,6 @@ func (t *KycChaincode) RegisterKYC(stub shim.ChaincodeStubInterface, args []stri
 func (t *KycChaincode) Query(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
 
 	var err error
-	var resAsBytes []byte
 	var UserPanNumber string
 
 	if len(args) != 1 {
@@ -94,34 +105,25 @@ func (t *KycChaincode) Query(stub shim.ChaincodeStubInterface, function string, 
 
 	UserPanNumber = args[0]
 
-	resAsBytes, err = t.GetKycDetails(stub, UserPanNumber)
+	var columns []shim.Column
+	col1 := shim.Column{Value: &shim.Column_String_{String_: UserPanNumber}}
+	columns = append(columns, col1)
 
-	fmt.Printf("Query Response:%s\n", resAsBytes)
-
+	row, err := stub.GetRow("tblKycDetails", columns)
 	if err != nil {
-		return nil, err
+		jsonResp := "{\"Error\":\"Failed retrieving data for " + UserPanNumber + ". Error " + err.Error() + ". \"}"
+		return nil, errors.New(jsonResp)
 	}
 
-	return resAsBytes, nil
-}
-
-func (t *KycChaincode) GetKycDetails(stub shim.ChaincodeStubInterface, UserPanNumber string) ([]byte, error) {
-
-	//var requiredObj KycData
-	KycTxAsBytes, err := stub.GetState(UserPanNumber)
-	if err != nil {
-		return nil, errors.New("Failed to get Merchant Transactions")
+	if len(row.Columns) == 0 {
+		jsonResp := "{\"Error\":\"no data present for " + UserPanNumber + " on blockchain. \"}"
+		return nil, errors.New(jsonResp)
 	}
-	//var KycTxObject KycData
-	//json.Unmarshal(KycTxAsBytes, &KycTxObject)
-	//fmt.Printf("Output from chaincode: %s\n", KycTxObject)
 
-	//res, err := json.Marshal(KycTxAsBytes)
-	//if err != nil {
-	//return nil, errors.New("Failed to Marshal the required Obj")
-	//}
-	return KycTxAsBytes, nil
+	jsonResp := "{\"KYC_DOC\":\"" + string(row.Columns[2].GetBytes()) + "\"}"
+	fmt.Printf("Query Response:%s\n", jsonResp)
 
+	return row.Columns[2].GetBytes(), nil
 }
 
 func main() {
