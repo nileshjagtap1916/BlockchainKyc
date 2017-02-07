@@ -25,8 +25,6 @@ func (t *KycChaincode) Init(stub shim.ChaincodeStubInterface, function string, a
 	var err error
 	// Initialize the chaincode
 
-	fmt.Printf("Deployment of KYC is completed\n")
-
 	/*var EmptyKYC KycData
 	jsonAsBytes, _ := json.Marshal(EmptyKYC)
 	err = stub.PutState(KycIndexTxStr, jsonAsBytes)
@@ -44,6 +42,7 @@ func (t *KycChaincode) Init(stub shim.ChaincodeStubInterface, function string, a
 		return nil, fmt.Errorf("Failed creating tblKycDetails table, [%v]", err)
 	}
 
+	fmt.Printf("Deployment of KYC is completed\n")
 	return nil, nil
 }
 
@@ -116,15 +115,15 @@ func (t *KycChaincode) Query(stub shim.ChaincodeStubInterface, function string, 
 		return nil, errors.New(jsonResp)
 	}
 
-	/*if len(row.Columns) == 0 {
+	if len(row.Columns) == 0 {
 		jsonResp := "{\"Error\":\"no data present for " + UserPanNumber + " on blockchain. \"}"
 		return nil, errors.New(jsonResp)
-	}*/
+	}
 
 	jsonResp := "{\"KYC_DOC\":\"" + row.Columns[2].GetString_() + "\"}"
 	fmt.Printf("Query Response:%s\n", jsonResp)
 
-	res, _ := json.Marshal(row)
+	res, _ := json.Marshal(row.Columns[2].GetString_())
 
 	return res, nil
 }
