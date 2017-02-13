@@ -116,10 +116,10 @@ func (t *KycChaincode) Query(stub shim.ChaincodeStubInterface, function string, 
 		return nil, errors.New(jsonResp)
 	}
 
-	if len(row.Columns) == 0 {
+	/*if len(row.Columns) == 0 {
 		jsonResp := "{\"Error\":\"no data present for " + UserPanNumber + " on blockchain. \"}"
 		return nil, errors.New(jsonResp)
-	}
+	}*/
 
 	KYCObj.USER_PAN_NO = row.Columns[0].GetString_()
 	KYCObj.USER_NAME = row.Columns[1].GetString_()
