@@ -22,27 +22,18 @@ type KycData struct {
 
 func (t *KycChaincode) Init(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
 
-	var err error
-	// Initialize the chaincode
+	if len(args) != 0 {
+		return nil, errors.New("Incorrect number of arguments. Expecting 0")
+	}
 
-	/*var EmptyKYC KycData
-	jsonAsBytes, _ := json.Marshal(EmptyKYC)
-	err = stub.PutState(KycIndexTxStr, jsonAsBytes)
-	if err != nil {
-		return nil, err
-	}*/
-
-	// Create ownership table
-	err = stub.CreateTable("tblKycDetails", []*shim.ColumnDefinition{
+	err := stub.CreateTable("tblKycDetails", []*shim.ColumnDefinition{
 		&shim.ColumnDefinition{Name: "USER_PAN_NO", Type: shim.ColumnDefinition_STRING, Key: true},
-		&shim.ColumnDefinition{Name: "USER_NAME", Type: shim.ColumnDefinition_BYTES, Key: false},
+		&shim.ColumnDefinition{Name: "USER_NAME", Type: shim.ColumnDefinition_STRING, Key: false},
 		&shim.ColumnDefinition{Name: "USER_KYC_PDF", Type: shim.ColumnDefinition_STRING, Key: false},
 	})
 	if err != nil {
-		return nil, fmt.Errorf("Failed creating tblKycDetails table, [%v]", err)
+		return nil, errors.New("Failed creating KYC table.")
 	}
-
-	fmt.Printf("Deployment of KYC is completed\n")
 	return nil, nil
 }
 
@@ -59,78 +50,58 @@ func (t *KycChaincode) Invoke(stub shim.ChaincodeStubInterface, function string,
 		return t.UpdateKycDetails(stub, args)
 	}*/
 
-	return nil, errors.New("Received unknown function invocation")
+	return nil, nil
 }
 
 func (t *KycChaincode) InsertKycDetails(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 	var err error
-	var ok bool
-	var UserPanNumber string
-	var UserName string
-	var UserKycDoc string
 
 	if len(args) != 3 {
 		return nil, errors.New("Incorrect number of arguments. Need 3 arguments")
 	}
 
-	// Initialize the chaincode
-	UserPanNumber = args[0]
-	UserName = args[1]
-	UserKycDoc = args[2]
-
-	ok, err = stub.InsertRow("tblKycDetails", shim.Row{
+	UserPanNumber := args[0]
+	UserName := args[1]
+	KycDoc := args[2]
+	ok, err := stub.InsertRow("tblKycDetails", shim.Row{
 		Columns: []*shim.Column{
 			&shim.Column{Value: &shim.Column_String_{String_: UserPanNumber}},
 			&shim.Column{Value: &shim.Column_String_{String_: UserName}},
-			&shim.Column{Value: &shim.Column_String_{String_: UserKycDoc}}},
+			&shim.Column{Value: &shim.Column_String_{String_: KycDoc}},
+		},
 	})
 
 	if !ok && err == nil {
-		fmt.Println("Error inserting row")
-		return nil, errors.New("Kyc Details already on blockchain.")
+		return nil, errors.New("Error in adding KYC record.")
 	}
-
 	return nil, nil
 }
 
 // Query callback representing the query of a chaincode
 func (t *KycChaincode) Query(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
 
-	var err error
-	var UserPanNumber string
-	var KYCObj KycData
+	var KycDataObj KycData
 
+	var err error
 	if len(args) != 1 {
-		return nil, errors.New("Incorrect number of arguments. Expecting name of the person to query")
+		return nil, errors.New("Incorrect number of arguments. Expecting enrollId to query")
 	}
 
-	UserPanNumber = args[0]
-
 	var columns []shim.Column
-	col1 := shim.Column{Value: &shim.Column_String_{String_: UserPanNumber}}
+
+	col1 := shim.Column{Value: &shim.Column_String_{String_: args[0]}}
 	columns = append(columns, col1)
 
 	row, err := stub.GetRow("tblKycDetails", columns)
 	if err != nil {
-		jsonResp := "{\"Error\":\"Failed retrieving data for " + UserPanNumber + ". Error " + err.Error() + ". \"}"
-		return nil, errors.New(jsonResp)
+		return nil, errors.New("Failed to query")
 	}
 
-	/*if len(row.Columns) == 0 {
-		jsonResp := "{\"Error\":\"no data present for " + UserPanNumber + " on blockchain. \"}"
-		return nil, errors.New(jsonResp)
-	}*/
+	KycDataObj.USER_PAN_NO = row.Columns[0].GetString_()
+	KycDataObj.USER_NAME = row.Columns[1].GetString_()
+	KycDataObj.USER_KYC_PDF = row.Columns[2].GetString_()
 
-	KYCObj.USER_PAN_NO = row.Columns[0].GetString_()
-	KYCObj.USER_NAME = row.Columns[1].GetString_()
-	KYCObj.USER_KYC_PDF = row.Columns[2].GetString_()
-
-	jsonAsBytes, _ := json.Marshal(KYCObj)
-
-	//jsonResp := "{\"KYC_DOC\":\"" + row.Columns[2].GetString_() + "\"}"
-	//fmt.Printf("Query Response:%s\n", jsonResp)
-
-	//res, _ := json.Marshal(row.Columns[2].GetString_())
+	jsonAsBytes, _ := json.Marshal(KycDataObj)
 
 	return jsonAsBytes, nil
 }
