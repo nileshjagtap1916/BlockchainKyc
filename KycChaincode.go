@@ -14,11 +14,11 @@ type KycChaincode struct {
 
 var KycIndexTxStr = "_KycIndexTxStr"
 
-/*type KycData struct {
+type KycData struct {
 	USER_PAN_NO  string `json:"USER_PAN_NO"`
 	USER_NAME    string `json:"USER_NAME"`
 	USER_KYC_PDF string `json:"USER_KYC_PDF"`
-}*/
+}
 
 func (t *KycChaincode) Init(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
 
@@ -98,6 +98,7 @@ func (t *KycChaincode) Query(stub shim.ChaincodeStubInterface, function string, 
 
 	var err error
 	var UserPanNumber string
+	var KYCObj KycData
 
 	if len(args) != 1 {
 		return nil, errors.New("Incorrect number of arguments. Expecting name of the person to query")
@@ -120,12 +121,18 @@ func (t *KycChaincode) Query(stub shim.ChaincodeStubInterface, function string, 
 		return nil, errors.New(jsonResp)
 	}
 
-	jsonResp := "{\"KYC_DOC\":\"" + row.Columns[2].GetString_() + "\"}"
-	fmt.Printf("Query Response:%s\n", jsonResp)
+	KYCObj.USER_PAN_NO = row.Columns[0].GetString_()
+	KYCObj.USER_NAME = row.Columns[1].GetString_()
+	KYCObj.USER_KYC_PDF = row.Columns[2].GetString_()
 
-	res, _ := json.Marshal(row.Columns[2].GetString_())
+	jsonAsBytes, _ := json.Marshal(KYCObj)
 
-	return res, nil
+	//jsonResp := "{\"KYC_DOC\":\"" + row.Columns[2].GetString_() + "\"}"
+	//fmt.Printf("Query Response:%s\n", jsonResp)
+
+	//res, _ := json.Marshal(row.Columns[2].GetString_())
+
+	return jsonAsBytes, nil
 }
 
 func main() {
