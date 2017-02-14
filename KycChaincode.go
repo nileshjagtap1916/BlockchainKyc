@@ -125,30 +125,40 @@ func (t *KycChaincode) UpdateKycDetails(stub shim.ChaincodeStubInterface, args [
 func (t *KycChaincode) Query(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
 
 	var KycDataObj KycData
-
-	var err error
+	var jsonAsBytes []byte
 	if len(args) != 1 {
 		return nil, errors.New("Incorrect number of arguments. Expecting enrollId to query")
 	}
 
-	var columns []shim.Column
+	UserId := args[0]
 
-	col1 := shim.Column{Value: &shim.Column_String_{String_: args[0]}}
-	columns = append(columns, col1)
+	if UserId == "" {
+		table, err := stub.GetTable("tblKycDetails")
+		if err != nil {
+			return nil, errors.New("Failed to query")
+		}
+		output := table.String()
+		jsonAsBytes, _ = json.Marshal(output)
+	} else {
+		var columns []shim.Column
 
-	row, err := stub.GetRow("tblKycDetails", columns)
-	if err != nil {
-		return nil, errors.New("Failed to query")
+		col1 := shim.Column{Value: &shim.Column_String_{String_: args[0]}}
+		columns = append(columns, col1)
+
+		row, err := stub.GetRow("tblKycDetails", columns)
+		if err != nil {
+			return nil, errors.New("Failed to query")
+		}
+
+		KycDataObj.USER_NAME = row.Columns[0].GetString_()
+		KycDataObj.USER_ID = row.Columns[1].GetString_()
+		KycDataObj.KYC_BANK_NAME = row.Columns[2].GetString_()
+		KycDataObj.KYC_CREATE_DATE = row.Columns[3].GetString_()
+		KycDataObj.KYC_VALID_TILL_DATE = row.Columns[4].GetString_()
+		KycDataObj.KYC_DOC_BLOB = row.Columns[5].GetString_()
+
+		jsonAsBytes, _ = json.Marshal(KycDataObj)
 	}
-
-	KycDataObj.USER_NAME = row.Columns[0].GetString_()
-	KycDataObj.USER_ID = row.Columns[1].GetString_()
-	KycDataObj.KYC_BANK_NAME = row.Columns[2].GetString_()
-	KycDataObj.KYC_CREATE_DATE = row.Columns[3].GetString_()
-	KycDataObj.KYC_VALID_TILL_DATE = row.Columns[4].GetString_()
-	KycDataObj.KYC_DOC_BLOB = row.Columns[5].GetString_()
-
-	jsonAsBytes, _ := json.Marshal(KycDataObj)
 
 	return jsonAsBytes, nil
 }
