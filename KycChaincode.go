@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 )
@@ -12,12 +13,13 @@ import (
 type KycChaincode struct {
 }
 
-var KycIndexTxStr = "_KycIndexTxStr"
-
 type KycData struct {
-	USER_PAN_NO  string `json:"USER_PAN_NO"`
-	USER_NAME    string `json:"USER_NAME"`
-	USER_KYC_PDF string `json:"USER_KYC_PDF"`
+	USER_NAME           string `json:"USER_NAME"`
+	USER_ID             string `json:"USER_ID"`
+	KYC_BANK_NAME       string `json:"KYC_BANK_NAME"`
+	KYC_CREATE_DATE     string `json:"KYC_CREATE_DATE"`
+	KYC_VALID_TILL_DATE string `json:"KYC_VALID_TILL_DATE"`
+	KYC_DOC_BLOB        string `json:"KYC_DOC_BLOB"`
 }
 
 func (t *KycChaincode) Init(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
@@ -27,9 +29,12 @@ func (t *KycChaincode) Init(stub shim.ChaincodeStubInterface, function string, a
 	}
 
 	err := stub.CreateTable("tblKycDetails", []*shim.ColumnDefinition{
-		&shim.ColumnDefinition{Name: "USER_PAN_NO", Type: shim.ColumnDefinition_STRING, Key: true},
-		&shim.ColumnDefinition{Name: "USER_NAME", Type: shim.ColumnDefinition_STRING, Key: false},
-		&shim.ColumnDefinition{Name: "USER_KYC_PDF", Type: shim.ColumnDefinition_STRING, Key: false},
+		&shim.ColumnDefinition{Name: "USER_NAME", Type: shim.ColumnDefinition_STRING, Key: true},
+		&shim.ColumnDefinition{Name: "USER_ID", Type: shim.ColumnDefinition_STRING, Key: false},
+		&shim.ColumnDefinition{Name: "KYC_BANK_NAME", Type: shim.ColumnDefinition_STRING, Key: false},
+		&shim.ColumnDefinition{Name: "KYC_CREATE_DATE", Type: shim.ColumnDefinition_STRING, Key: true},
+		&shim.ColumnDefinition{Name: "KYC_VALID_TILL_DATE", Type: shim.ColumnDefinition_STRING, Key: false},
+		&shim.ColumnDefinition{Name: "KYC_DOC_BLOB", Type: shim.ColumnDefinition_STRING, Key: false},
 	})
 	if err != nil {
 		return nil, errors.New("Failed creating KYC table.")
@@ -60,13 +65,21 @@ func (t *KycChaincode) InsertKycDetails(stub shim.ChaincodeStubInterface, args [
 		return nil, errors.New("Incorrect number of arguments. Need 3 arguments")
 	}
 
-	UserPanNumber := args[0]
-	UserName := args[1]
-	KycDoc := args[2]
+	UserName := args[0]
+	UserId := args[1]
+	BankName := args[2]
+	KycDoc := args[3]
+	CurrentDate := time.Now().Local()
+	CreateDate := CurrentDate.Format("02-01-2006")
+	ValidTillDate := CurrentDate.AddDate(2, 0, 0).Format("02-01-2006")
+
 	ok, err := stub.InsertRow("tblKycDetails", shim.Row{
 		Columns: []*shim.Column{
-			&shim.Column{Value: &shim.Column_String_{String_: UserPanNumber}},
 			&shim.Column{Value: &shim.Column_String_{String_: UserName}},
+			&shim.Column{Value: &shim.Column_String_{String_: UserId}},
+			&shim.Column{Value: &shim.Column_String_{String_: BankName}},
+			&shim.Column{Value: &shim.Column_String_{String_: CreateDate}},
+			&shim.Column{Value: &shim.Column_String_{String_: ValidTillDate}},
 			&shim.Column{Value: &shim.Column_String_{String_: KycDoc}},
 		},
 	})
@@ -97,9 +110,12 @@ func (t *KycChaincode) Query(stub shim.ChaincodeStubInterface, function string, 
 		return nil, errors.New("Failed to query")
 	}
 
-	KycDataObj.USER_PAN_NO = row.Columns[0].GetString_()
-	KycDataObj.USER_NAME = row.Columns[1].GetString_()
-	KycDataObj.USER_KYC_PDF = row.Columns[2].GetString_()
+	KycDataObj.USER_NAME = row.Columns[0].GetString_()
+	KycDataObj.USER_ID = row.Columns[1].GetString_()
+	KycDataObj.KYC_BANK_NAME = row.Columns[2].GetString_()
+	KycDataObj.KYC_CREATE_DATE = row.Columns[3].GetString_()
+	KycDataObj.KYC_VALID_TILL_DATE = row.Columns[4].GetString_()
+	KycDataObj.KYC_DOC_BLOB = row.Columns[5].GetString_()
 
 	jsonAsBytes, _ := json.Marshal(KycDataObj)
 
