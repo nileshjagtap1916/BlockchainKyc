@@ -61,7 +61,7 @@ func (t *KycChaincode) Invoke(stub shim.ChaincodeStubInterface, function string,
 func (t *KycChaincode) InsertKycDetails(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 	var err error
 
-	if len(args) != 3 {
+	if len(args) != 4 {
 		return nil, errors.New("Incorrect number of arguments. Need 3 arguments")
 	}
 
