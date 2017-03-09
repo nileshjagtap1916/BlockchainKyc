@@ -8,3 +8,9 @@ type KycData struct {
 	KYC_VALID_TILL_DATE string `json:"KYC_VALID_TILL_DATE"`
 	KYC_DOC_BLOB        string `json:"KYC_DOC_BLOB"`
 }
+
+type KycCount struct {
+	AllContracts      int
+	ExperingContracts int
+	CreatedContracts  int
+}
