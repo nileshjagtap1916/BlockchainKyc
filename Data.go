@@ -1,10 +1,10 @@
 package main
 
 type KycData struct {
-	UserId        string `json:"USER_ID"`
-	BankName      string `json:"BANK_NAME"`
-	UserName      string `json:"USER_NAME"`
-	CreateDate    string `json:"KYC_CREATE_DATE"`
-	ValidTillDate string `json:"KYC_VALID_TILL_DATE"`
-	KycDocument   string `json:"KYC_DOC_BLOB"`
+	UserId        string `json:"UserId"`
+	BankName      string `json:"BankName"`
+	UserName      string `json:"UserName"`
+	CreateDate    string `json:"CreateDate"`
+	ValidTillDate string `json:"ValidTillDate"`
+	KycDocument   string `json:"KycDocument"`
 }
