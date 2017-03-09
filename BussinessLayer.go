@@ -71,7 +71,7 @@ func SaveBankDetails(stub shim.ChaincodeStubInterface, args []string) ([]byte, e
 	return nil, nil
 }
 
-func GetKyc(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+func GetKycByBankName(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 	//return GetKYCDetails(stub, args)
 
 	var KycList []KycData
@@ -94,6 +94,46 @@ func GetKyc(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 	}
 
 	JsonAsBytes, _ := json.Marshal(KycList)
+
+	return JsonAsBytes, nil
+}
+
+func GetKycCount(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+	All := 0
+	Expering := 0
+	Created := 0
+	var KycDetails KycData
+	var KycCountObj KycCount
+
+	if len(args) != 1 {
+		return nil, errors.New("Incorrect number of arguments. Need 1 argument")
+	}
+
+	BankName := args[0]
+
+	UserList, _ := GetUserList(stub, BankName)
+
+	for _, UserId := range UserList {
+		All = All + 1
+		KycDetails, _ = GetKYCDetails(stub, UserId, BankName)
+
+		CurrentMonth := time.Now().Month()
+		ValidTillDate, _ := time.Parse("02-01-2006", KycDetails.KYC_VALID_TILL_DATE)
+		CreateDate, _ := time.Parse("02-01-2006", KycDetails.KYC_CREATE_DATE)
+
+		if CurrentMonth == ValidTillDate.Month() {
+			Expering = Expering + 1
+		}
+		if CurrentMonth == CreateDate.Month() {
+			Created = Created + 1
+		}
+	}
+
+	KycCountObj.AllContracts = All
+	KycCountObj.ExperingContracts = Expering
+	KycCountObj.CreatedContracts = Created
+
+	JsonAsBytes, _ := json.Marshal(KycCountObj)
 
 	return JsonAsBytes, nil
 }
