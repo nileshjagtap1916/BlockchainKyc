@@ -71,25 +71,26 @@ func SaveBankDetails(stub shim.ChaincodeStubInterface, args []string) ([]byte, e
 }
 
 func GetKyc(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
-	var KycList []KycData
+	//var KycList []KycData
 	var KycDetails KycData
 
-	if len(args) != 1 {
+	if len(args) != 2 {
 		return nil, errors.New("Incorrect number of arguments. Need 1 argument")
 	}
 
 	//get data from middle layer
 	BankName := args[0]
+	UserId := args[1]
 
 	//get data from blockchain
-	UserList, _ := GetUserList(stub, BankName)
+	//UserList, _ := GetUserList(stub, BankName)
 
-	for _, UserId := range UserList {
-		KycDetails, _ = GetKYCDetails(stub, UserId, BankName)
-		KycList = append(KycList, KycDetails)
-	}
+	//for _, UserId := range UserList {
+	KycDetails, _ = GetKYCDetails(stub, UserId, BankName)
+	//KycList = append(KycList, KycDetails)
+	//}
 
-	JsonAsBytes, _ := json.Marshal(KycList)
+	JsonAsBytes, _ := json.Marshal(KycDetails)
 
 	return JsonAsBytes, nil
 }
