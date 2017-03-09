@@ -117,14 +117,14 @@ func GetKycCount(stub shim.ChaincodeStubInterface, args []string) ([]byte, error
 		All = All + 1
 		KycDetails, _ = GetKYCDetails(stub, UserId, BankName)
 
-		CurrentMonth := time.Now().Month()
+		CurrentDate := time.Now()
 		ValidTillDate, _ := time.Parse("02-01-2006", KycDetails.KYC_VALID_TILL_DATE)
 		CreateDate, _ := time.Parse("02-01-2006", KycDetails.KYC_CREATE_DATE)
 
-		if CurrentMonth == ValidTillDate.Month() {
+		if CurrentDate.Month() == ValidTillDate.Month() && CurrentDate.Year() == ValidTillDate.Year() {
 			Expering = Expering + 1
 		}
-		if CurrentMonth == CreateDate.Month() {
+		if CurrentDate.Month() == CreateDate.Month() && CurrentDate.Year() == CreateDate.Year() {
 			Created = Created + 1
 		}
 	}
