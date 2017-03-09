@@ -11,6 +11,6 @@ type KycData struct {
 
 type KycCount struct {
 	AllContracts      int
-	ExperingContracts int
+	ExpiringContracts int
 	CreatedContracts  int
 }
