@@ -1,18 +1,14 @@
 package main
 
-import (
-	"encoding/json"
-	"errors"
-
-	"github.com/hyperledger/fabric/core/chaincode/shim"
-)
+import "github.com/hyperledger/fabric/core/chaincode/shim"
 
 func InitializeChaincode(stub shim.ChaincodeStubInterface) error {
 	return CreateDatabase(stub)
 }
 
 func SaveKycDetails(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
-	var KycDetails KycData
+	return InsertKYCDetails(stub, args)
+	/*var KycDetails KycData
 	var err error
 	var ok bool
 
@@ -21,13 +17,13 @@ func SaveKycDetails(stub shim.ChaincodeStubInterface, args []string) ([]byte, er
 	}
 
 	//get data from middle layer
-	/*KycDetails.UserId = args[0]
+	KycDetails.UserId = args[0]
 	KycDetails.BankName = args[1]
 	KycDetails.UserName = args[2]
 	KycDetails.KycDocument = args[3]
 	CurrentDate := time.Now().Local()
 	KycDetails.CreateDate = CurrentDate.Format("02-01-2006")
-	KycDetails.ValidTillDate = CurrentDate.AddDate(2, 0, 0).Format("02-01-2006")*/
+	KycDetails.ValidTillDate = CurrentDate.AddDate(2, 0, 0).Format("02-01-2006")
 
 	//save data into blockchain
 	ok, err = InsertKYCDetails(stub, args)
@@ -45,10 +41,10 @@ func SaveKycDetails(stub shim.ChaincodeStubInterface, args []string) ([]byte, er
 		return nil, errors.New("Error in Updating User ContractList")
 	}
 
-	return nil, nil
+	return nil, nil*/
 }
 
-func SaveBankDetails(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+/*func SaveBankDetails(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 	var UserList []string
 	var err error
 	var ok bool
@@ -67,11 +63,13 @@ func SaveBankDetails(stub shim.ChaincodeStubInterface, args []string) ([]byte, e
 	}
 
 	return nil, nil
-}
+}*/
 
 func GetKyc(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+	return GetKYCDetails(stub, args)
+
 	//var KycList []KycData
-	var KycDetails KycData
+	/*var KycDetails KycData
 
 	if len(args) != 2 {
 		return nil, errors.New("Incorrect number of arguments. Need 1 argument")
@@ -91,5 +89,5 @@ func GetKyc(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 
 	JsonAsBytes, _ := json.Marshal(KycDetails)
 
-	return JsonAsBytes, nil
+	return JsonAsBytes, nil*/
 }
