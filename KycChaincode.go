@@ -33,8 +33,7 @@ func (t *KycChaincode) Invoke(stub shim.ChaincodeStubInterface, function string,
 	if function == "InsertKycDetails" {
 		// Insert User's KYC data in blockchain
 		return SaveKycDetails(stub, args)
-	}
-	if function == "InsertBankDetails" {
+	} else if function == "InsertBankDetails" {
 		// save BankDetails in blockchain
 		return SaveBankDetails(stub, args)
 	}
@@ -46,9 +45,12 @@ func (t *KycChaincode) Invoke(stub shim.ChaincodeStubInterface, function string,
 func (t *KycChaincode) Query(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
 
 	// Handle different functions
-	if function == "GetKycDetails" {
+	if function == "GetKycByBankName" {
 		// get User's KYC data from blockchain
-		return GetKyc(stub, args)
+		return GetKycByBankName(stub, args)
+	} else if function == "GetKycCount" {
+		// get User's KYC Count
+		return GetKycCount(stub, args)
 	}
 
 	return nil, nil
