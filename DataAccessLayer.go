@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"time"
 
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 )
@@ -35,17 +36,26 @@ func CreateDatabase(stub shim.ChaincodeStubInterface) error {
 	return nil
 }
 
-func InsertKYCDetails(stub shim.ChaincodeStubInterface, KYCDetails KycData) (bool, error) {
+func InsertKYCDetails(stub shim.ChaincodeStubInterface, args []string) (bool, error) {
 	var err error
 	var ok bool
+
+	UserId := args[0]
+	UserName := args[1]
+	BankName := args[2]
+	KycDoc := args[3]
+	CurrentDate := time.Now().Local()
+	CreateDate := CurrentDate.Format("02-01-2006")
+	ValidTillDate := CurrentDate.AddDate(2, 0, 0).Format("02-01-2006")
+
 	ok, err = stub.InsertRow("KycDetails", shim.Row{
 		Columns: []*shim.Column{
-			&shim.Column{Value: &shim.Column_String_{String_: KYCDetails.UserId}},
-			&shim.Column{Value: &shim.Column_String_{String_: KYCDetails.BankName}},
-			&shim.Column{Value: &shim.Column_String_{String_: KYCDetails.UserName}},
-			&shim.Column{Value: &shim.Column_String_{String_: KYCDetails.CreateDate}},
-			&shim.Column{Value: &shim.Column_String_{String_: KYCDetails.ValidTillDate}},
-			&shim.Column{Value: &shim.Column_String_{String_: KYCDetails.KycDocument}},
+			&shim.Column{Value: &shim.Column_String_{String_: UserId}},
+			&shim.Column{Value: &shim.Column_String_{String_: BankName}},
+			&shim.Column{Value: &shim.Column_String_{String_: UserName}},
+			&shim.Column{Value: &shim.Column_String_{String_: CreateDate}},
+			&shim.Column{Value: &shim.Column_String_{String_: ValidTillDate}},
+			&shim.Column{Value: &shim.Column_String_{String_: KycDoc}},
 		},
 	})
 	return ok, err
