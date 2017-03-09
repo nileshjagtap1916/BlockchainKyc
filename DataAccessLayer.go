@@ -41,8 +41,8 @@ func InsertKYCDetails(stub shim.ChaincodeStubInterface, args []string) (bool, er
 	var ok bool
 
 	UserId := args[0]
-	UserName := args[1]
-	BankName := args[2]
+	BankName := args[1]
+	UserName := args[2]
 	KycDoc := args[3]
 	CurrentDate := time.Now().Local()
 	CreateDate := CurrentDate.Format("02-01-2006")
