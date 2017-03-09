@@ -33,7 +33,8 @@ func (t *KycChaincode) Invoke(stub shim.ChaincodeStubInterface, function string,
 	if function == "InsertKycDetails" {
 		// Insert User's KYC data in blockchain
 		return SaveKycDetails(stub, args)
-	} else if function == "InsertBankDetails" {
+	}
+	if function == "InsertBankDetails" {
 		// save BankDetails in blockchain
 		return SaveBankDetails(stub, args)
 	}
