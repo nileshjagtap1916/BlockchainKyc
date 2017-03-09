@@ -26,7 +26,7 @@ func CreateDatabase(stub shim.ChaincodeStubInterface) error {
 	//Create table "BankDetails"
 	err = stub.CreateTable("BankDetails", []*shim.ColumnDefinition{
 		&shim.ColumnDefinition{Name: "BankName", Type: shim.ColumnDefinition_STRING, Key: true},
-		&shim.ColumnDefinition{Name: "UserList", Type: shim.ColumnDefinition_STRING, Key: false},
+		&shim.ColumnDefinition{Name: "UserList", Type: shim.ColumnDefinition_BYTES, Key: false},
 	})
 	if err != nil {
 		return errors.New("Failed creating BankDetails table.")
