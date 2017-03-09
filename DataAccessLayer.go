@@ -69,8 +69,8 @@ func GetKYCDetails(stub shim.ChaincodeStubInterface, UserId string, BankName str
 	var columns []shim.Column
 
 	col1 := shim.Column{Value: &shim.Column_String_{String_: UserId}}
-	columns = append(columns, col1)
 	col2 := shim.Column{Value: &shim.Column_String_{String_: BankName}}
+	columns = append(columns, col1)
 	columns = append(columns, col2)
 
 	row, err := stub.GetRow("KYCDetails", columns)
