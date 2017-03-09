@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"errors"
-	"time"
 
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 )
@@ -36,7 +35,7 @@ func CreateDatabase(stub shim.ChaincodeStubInterface) error {
 	return nil
 }
 
-func InsertKYCDetails(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+/*func InsertKYCDetails(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 	var err error
 
 	if len(args) != 4 {
@@ -66,23 +65,30 @@ func InsertKYCDetails(stub shim.ChaincodeStubInterface, args []string) ([]byte, 
 		return nil, errors.New("Error in adding KYC record.")
 	}
 	return nil, nil
+}*/
+
+func InsertKYCDetails(stub shim.ChaincodeStubInterface, Kycdetails KycData) (bool, error) {
+	return stub.InsertRow("tblKycDetails", shim.Row{
+		Columns: []*shim.Column{
+			&shim.Column{Value: &shim.Column_String_{String_: Kycdetails.USER_ID}},
+			&shim.Column{Value: &shim.Column_String_{String_: Kycdetails.KYC_BANK_NAME}},
+			&shim.Column{Value: &shim.Column_String_{String_: Kycdetails.USER_NAME}},
+			&shim.Column{Value: &shim.Column_String_{String_: Kycdetails.KYC_CREATE_DATE}},
+			&shim.Column{Value: &shim.Column_String_{String_: Kycdetails.KYC_VALID_TILL_DATE}},
+			&shim.Column{Value: &shim.Column_String_{String_: Kycdetails.KYC_DOC_BLOB}},
+		},
+	})
 }
 
-/*func InsertBankDetails(stub shim.ChaincodeStubInterface, BankName string, UserList []string) ([]byte, error) {
-	var err error
-	var ok bool
+func InsertBankDetails(stub shim.ChaincodeStubInterface, BankName string, UserList []string) (bool, error) {
 	JsonAsBytes, _ := json.Marshal(UserList)
-	ok, err = stub.InsertRow("BankDetails", shim.Row{
+	return stub.InsertRow("BankDetails", shim.Row{
 		Columns: []*shim.Column{
 			&shim.Column{Value: &shim.Column_String_{String_: BankName}},
 			&shim.Column{Value: &shim.Column_Bytes{Bytes: JsonAsBytes}},
 		},
 	})
-	if !ok && err == nil {
-		return nil, errors.New("Error in adding KYC record.")
-	}
-	return nil, nil
-}*/
+}
 
 func GetKYCDetails(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 	var KycDataObj KycData
@@ -117,7 +123,7 @@ func GetKYCDetails(stub shim.ChaincodeStubInterface, args []string) ([]byte, err
 	return jsonAsBytes, nil
 }
 
-/*func GetUserList(stub shim.ChaincodeStubInterface, BankName string) ([]string, error) {
+func GetUserList(stub shim.ChaincodeStubInterface, BankName string) ([]string, error) {
 	var UserList []string
 	var columns []shim.Column
 
@@ -133,21 +139,16 @@ func GetKYCDetails(stub shim.ChaincodeStubInterface, args []string) ([]byte, err
 	json.Unmarshal(UsersAsBytes, &UserList)
 
 	return UserList, nil
-}*/
+}
 
-/*func UpdateBankDetails(stub shim.ChaincodeStubInterface, BankName string, Userlist []string) (bool, error) {
+func UpdateBankDetails(stub shim.ChaincodeStubInterface, BankName string, Userlist []string) (bool, error) {
 
 	JsonAsBytes, _ := json.Marshal(Userlist)
 
-	ok, err := stub.ReplaceRow("BankDetails", shim.Row{
+	return stub.ReplaceRow("BankDetails", shim.Row{
 		Columns: []*shim.Column{
 			&shim.Column{Value: &shim.Column_String_{String_: BankName}},
 			&shim.Column{Value: &shim.Column_Bytes{Bytes: JsonAsBytes}},
 		},
 	})
-
-	if !ok && err == nil {
-		return false, errors.New("Error in updating Bank record.")
-	}
-	return true, nil
-}*/
+}
