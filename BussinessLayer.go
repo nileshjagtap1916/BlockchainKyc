@@ -1,14 +1,19 @@
 package main
 
-import "github.com/hyperledger/fabric/core/chaincode/shim"
+import (
+	"errors"
+	"time"
+
+	"github.com/hyperledger/fabric/core/chaincode/shim"
+)
 
 func InitializeChaincode(stub shim.ChaincodeStubInterface) error {
 	return CreateDatabase(stub)
 }
 
 func SaveKycDetails(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
-	return InsertKYCDetails(stub, args)
-	/*var KycDetails KycData
+	//return InsertKYCDetails(stub, args)
+	var KycDetails KycData
 	var err error
 	var ok bool
 
@@ -17,23 +22,23 @@ func SaveKycDetails(stub shim.ChaincodeStubInterface, args []string) ([]byte, er
 	}
 
 	//get data from middle layer
-	KycDetails.UserId = args[0]
-	KycDetails.BankName = args[1]
-	KycDetails.UserName = args[2]
-	KycDetails.KycDocument = args[3]
+	KycDetails.USER_ID = args[0]
+	KycDetails.KYC_BANK_NAME = args[1]
+	KycDetails.USER_NAME = args[2]
+	KycDetails.KYC_DOC_BLOB = args[3]
 	CurrentDate := time.Now().Local()
-	KycDetails.CreateDate = CurrentDate.Format("02-01-2006")
-	KycDetails.ValidTillDate = CurrentDate.AddDate(2, 0, 0).Format("02-01-2006")
+	KycDetails.KYC_CREATE_DATE = CurrentDate.Format("02-01-2006")
+	KycDetails.KYC_VALID_TILL_DATE = CurrentDate.AddDate(2, 0, 0).Format("02-01-2006")
 
 	//save data into blockchain
-	ok, err = InsertKYCDetails(stub, args)
+	ok, err = InsertKYCDetails(stub, KycDetails)
 	if !ok && err == nil {
 		return nil, errors.New("Error in adding KycDetails record.")
 	}
 
 	// Update Userlist with current UserId
-	UserList, _ := GetUserList(stub, args[1])
-	UserList = append(UserList, KycDetails.UserId)
+	UserList, _ := GetUserList(stub, KycDetails.KYC_BANK_NAME)
+	UserList = append(UserList, KycDetails.USER_ID)
 
 	//Update Bank details on blockchain
 	ok, err = UpdateBankDetails(stub, args[1], UserList)
@@ -41,10 +46,10 @@ func SaveKycDetails(stub shim.ChaincodeStubInterface, args []string) ([]byte, er
 		return nil, errors.New("Error in Updating User ContractList")
 	}
 
-	return nil, nil*/
+	return nil, nil
 }
 
-/*func SaveBankDetails(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+func SaveBankDetails(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 	var UserList []string
 	var err error
 	var ok bool
@@ -63,7 +68,7 @@ func SaveKycDetails(stub shim.ChaincodeStubInterface, args []string) ([]byte, er
 	}
 
 	return nil, nil
-}*/
+}
 
 func GetKyc(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 	return GetKYCDetails(stub, args)
