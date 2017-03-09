@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
 	"time"
 
@@ -71,28 +72,28 @@ func SaveBankDetails(stub shim.ChaincodeStubInterface, args []string) ([]byte, e
 }
 
 func GetKyc(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
-	return GetKYCDetails(stub, args)
+	//return GetKYCDetails(stub, args)
 
-	//var KycList []KycData
-	/*var KycDetails KycData
+	var KycList []KycData
+	var KycDetails KycData
 
-	if len(args) != 2 {
+	if len(args) != 1 {
 		return nil, errors.New("Incorrect number of arguments. Need 1 argument")
 	}
 
 	//get data from middle layer
 	BankName := args[0]
-	UserId := args[1]
+	//UserId := args[1]
 
 	//get data from blockchain
-	//UserList, _ := GetUserList(stub, BankName)
+	UserList, _ := GetUserList(stub, BankName)
 
-	//for _, UserId := range UserList {
-	KycDetails, _ = GetKYCDetails(stub, UserId, BankName)
-	//KycList = append(KycList, KycDetails)
-	//}
+	for _, UserId := range UserList {
+		KycDetails, _ = GetKYCDetails(stub, UserId, BankName)
+		KycList = append(KycList, KycDetails)
+	}
 
-	JsonAsBytes, _ := json.Marshal(KycDetails)
+	JsonAsBytes, _ := json.Marshal(KycList)
 
-	return JsonAsBytes, nil*/
+	return JsonAsBytes, nil
 }
