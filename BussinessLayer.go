@@ -17,8 +17,8 @@ func SaveKycDetails(stub shim.ChaincodeStubInterface, args []string) ([]byte, er
 	var err error
 	var ok bool
 
-	if len(args) != 1 {
-		return nil, errors.New("Incorrect number of arguments. Need 1 argument")
+	if len(args) != 4 {
+		return nil, errors.New("Incorrect number of arguments. Need 4 argument")
 	}
 
 	//get data from middle layer
