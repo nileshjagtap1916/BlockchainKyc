@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"errors"
-	"time"
 
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 )
@@ -22,16 +21,16 @@ func SaveKycDetails(stub shim.ChaincodeStubInterface, args []string) ([]byte, er
 	}
 
 	//get data from middle layer
-	KycDetails.UserId = args[0]
+	/*KycDetails.UserId = args[0]
 	KycDetails.BankName = args[1]
 	KycDetails.UserName = args[2]
 	KycDetails.KycDocument = args[3]
 	CurrentDate := time.Now().Local()
 	KycDetails.CreateDate = CurrentDate.Format("02-01-2006")
-	KycDetails.ValidTillDate = CurrentDate.AddDate(2, 0, 0).Format("02-01-2006")
+	KycDetails.ValidTillDate = CurrentDate.AddDate(2, 0, 0).Format("02-01-2006")*/
 
 	//save data into blockchain
-	ok, err = InsertKYCDetails(stub, KycDetails)
+	ok, err = InsertKYCDetails(stub, args)
 	if !ok && err == nil {
 		return nil, errors.New("Error in adding KycDetails record.")
 	}
