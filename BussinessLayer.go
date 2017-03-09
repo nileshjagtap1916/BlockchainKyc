@@ -36,11 +36,11 @@ func SaveKycDetails(stub shim.ChaincodeStubInterface, args []string) ([]byte, er
 	}
 
 	// Update Userlist with current UserId
-	UserList, _ := GetUserList(stub, KycDetails.BankName)
+	UserList, _ := GetUserList(stub, args[1])
 	UserList = append(UserList, KycDetails.UserId)
 
 	//Update Bank details on blockchain
-	ok, err = UpdateBankDetails(stub, KycDetails.BankName, UserList)
+	ok, err = UpdateBankDetails(stub, args[1], UserList)
 	if !ok && err == nil {
 		return nil, errors.New("Error in Updating User ContractList")
 	}
