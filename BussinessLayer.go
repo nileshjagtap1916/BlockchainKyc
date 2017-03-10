@@ -213,14 +213,15 @@ func UpdateKyc(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) 
 	var err error
 	var ok bool
 
-	if len(args) != 2 {
-		return nil, errors.New("Incorrect number of arguments. Need 2 arguments")
+	if len(args) != 3 {
+		return nil, errors.New("Incorrect number of arguments. Need 3 arguments")
 	}
 
 	//get data from middle layer
 	KycDetails, _ := GetKYCDetails(stub, args[0])
 
-	KycDetails.KYC_DOC_BLOB = args[1]
+	KycDetails.USER_NAME = args[1]
+	KycDetails.KYC_DOC_BLOB = args[2]
 	CurrentDate := time.Now().Local()
 	KycDetails.KYC_VALID_TILL_DATE = CurrentDate.AddDate(2, 0, 0).Format("02 Jan 2006")
 
