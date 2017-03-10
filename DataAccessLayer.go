@@ -35,38 +35,6 @@ func CreateDatabase(stub shim.ChaincodeStubInterface) error {
 	return nil
 }
 
-/*func InsertKYCDetails(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
-	var err error
-
-	if len(args) != 4 {
-		return nil, errors.New("Incorrect number of arguments. Need 4 arguments")
-	}
-
-	UserId := args[0]
-	BankName := args[1]
-	UserName := args[2]
-	KycDoc := args[3]
-	CurrentDate := time.Now().Local()
-	CreateDate := CurrentDate.Format("02-01-2006")
-	ValidTillDate := CurrentDate.AddDate(2, 0, 0).Format("02-01-2006")
-
-	ok, err := stub.InsertRow("KycDetails", shim.Row{
-		Columns: []*shim.Column{
-			&shim.Column{Value: &shim.Column_String_{String_: UserId}},
-			&shim.Column{Value: &shim.Column_String_{String_: BankName}},
-			&shim.Column{Value: &shim.Column_String_{String_: UserName}},
-			&shim.Column{Value: &shim.Column_String_{String_: CreateDate}},
-			&shim.Column{Value: &shim.Column_String_{String_: ValidTillDate}},
-			&shim.Column{Value: &shim.Column_String_{String_: KycDoc}},
-		},
-	})
-
-	if !ok && err == nil {
-		return nil, errors.New("Error in adding KYC record.")
-	}
-	return nil, nil
-}*/
-
 func InsertKYCDetails(stub shim.ChaincodeStubInterface, Kycdetails KycData) (bool, error) {
 	return stub.InsertRow("KycDetails", shim.Row{
 		Columns: []*shim.Column{
@@ -96,9 +64,7 @@ func GetKYCDetails(stub shim.ChaincodeStubInterface, UserId string) (KycData, er
 	var columns []shim.Column
 
 	col1 := shim.Column{Value: &shim.Column_String_{String_: UserId}}
-	//col2 := shim.Column{Value: &shim.Column_String_{String_: UserBank}}
 	columns = append(columns, col1)
-	//columns = append(columns, col2)
 
 	row, err := stub.GetRow("KycDetails", columns)
 	if err != nil {
@@ -112,7 +78,6 @@ func GetKYCDetails(stub shim.ChaincodeStubInterface, UserId string) (KycData, er
 	KycDataObj.KYC_VALID_TILL_DATE = row.Columns[4].GetString_()
 	KycDataObj.KYC_DOC_BLOB = row.Columns[5].GetString_()
 
-	//jsonAsBytes, _ := json.Marshal(KycDataObj)
 	return KycDataObj, nil
 }
 
