@@ -27,8 +27,8 @@ func SaveKycDetails(stub shim.ChaincodeStubInterface, args []string) ([]byte, er
 	KycDetails.USER_NAME = args[2]
 	KycDetails.KYC_DOC_BLOB = args[3]
 	CurrentDate := time.Now().Local()
-	KycDetails.KYC_CREATE_DATE = CurrentDate.Format("02-01-2006")
-	KycDetails.KYC_VALID_TILL_DATE = CurrentDate.AddDate(2, 0, 0).Format("02-01-2006")
+	KycDetails.KYC_CREATE_DATE = CurrentDate.Format("02 Jan 2006")
+	KycDetails.KYC_VALID_TILL_DATE = CurrentDate.AddDate(2, 0, 0).Format("02 Jan 2006")
 
 	//save data into blockchain
 	ok, err = InsertKYCDetails(stub, KycDetails)
@@ -86,8 +86,6 @@ func GetKycByUserId(stub shim.ChaincodeStubInterface, args []string) ([]byte, er
 }
 
 func GetKycByBankName(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
-	//return GetKYCDetails(stub, args)
-
 	var KycList []KycData
 	var KycDetails KycData
 
@@ -113,8 +111,6 @@ func GetKycByBankName(stub shim.ChaincodeStubInterface, args []string) ([]byte, 
 }
 
 func GetKycByExpiringMonth(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
-	//return GetKYCDetails(stub, args)
-
 	var KycList []KycData
 	var KycDetails KycData
 
@@ -132,7 +128,7 @@ func GetKycByExpiringMonth(stub shim.ChaincodeStubInterface, args []string) ([]b
 		KycDetails, _ = GetKYCDetails(stub, UserId)
 
 		CurrentDate := time.Now()
-		ValidTillDate, _ := time.Parse("02-01-2006", KycDetails.KYC_VALID_TILL_DATE)
+		ValidTillDate, _ := time.Parse("02 Jan 2006", KycDetails.KYC_VALID_TILL_DATE)
 
 		if CurrentDate.Month() == ValidTillDate.Month() && CurrentDate.Year() == ValidTillDate.Year() {
 			KycList = append(KycList, KycDetails)
@@ -145,8 +141,6 @@ func GetKycByExpiringMonth(stub shim.ChaincodeStubInterface, args []string) ([]b
 }
 
 func GetKycByCreatedMonth(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
-	//return GetKYCDetails(stub, args)
-
 	var KycList []KycData
 	var KycDetails KycData
 
@@ -164,7 +158,7 @@ func GetKycByCreatedMonth(stub shim.ChaincodeStubInterface, args []string) ([]by
 		KycDetails, _ = GetKYCDetails(stub, UserId)
 
 		CurrentDate := time.Now()
-		CreateDate, _ := time.Parse("02-01-2006", KycDetails.KYC_CREATE_DATE)
+		CreateDate, _ := time.Parse("02 Jan 2006", KycDetails.KYC_CREATE_DATE)
 		if CurrentDate.Month() == CreateDate.Month() && CurrentDate.Year() == CreateDate.Year() {
 			KycList = append(KycList, KycDetails)
 		}
@@ -195,8 +189,8 @@ func GetKycCount(stub shim.ChaincodeStubInterface, args []string) ([]byte, error
 		KycDetails, _ = GetKYCDetails(stub, UserId)
 
 		CurrentDate := time.Now()
-		ValidTillDate, _ := time.Parse("02-01-2006", KycDetails.KYC_VALID_TILL_DATE)
-		CreateDate, _ := time.Parse("02-01-2006", KycDetails.KYC_CREATE_DATE)
+		ValidTillDate, _ := time.Parse("02 Jan 2006", KycDetails.KYC_VALID_TILL_DATE)
+		CreateDate, _ := time.Parse("02 Jan 2006", KycDetails.KYC_CREATE_DATE)
 
 		if CurrentDate.Month() == ValidTillDate.Month() && CurrentDate.Year() == ValidTillDate.Year() {
 			Expiring = Expiring + 1
@@ -220,7 +214,7 @@ func UpdateKyc(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) 
 	var ok bool
 
 	if len(args) != 2 {
-		return nil, errors.New("Incorrect number of arguments. Need 4 argument")
+		return nil, errors.New("Incorrect number of arguments. Need 2 arguments")
 	}
 
 	//get data from middle layer
@@ -228,7 +222,7 @@ func UpdateKyc(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) 
 
 	KycDetails.KYC_DOC_BLOB = args[1]
 	CurrentDate := time.Now().Local()
-	KycDetails.KYC_VALID_TILL_DATE = CurrentDate.AddDate(2, 0, 0).Format("02-01-2006")
+	KycDetails.KYC_VALID_TILL_DATE = CurrentDate.AddDate(2, 0, 0).Format("02 Jan 2006")
 
 	//Update data into blockchain
 	ok, err = UpdateKycDetails(stub, KycDetails)
