@@ -71,6 +71,7 @@ func SaveBankDetails(stub shim.ChaincodeStubInterface, args []string) ([]byte, e
 }
 
 func GetKycByUserId(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+	var KycList []KycData
 	var KycDetails KycData
 
 	if len(args) != 1 {
@@ -80,7 +81,8 @@ func GetKycByUserId(stub shim.ChaincodeStubInterface, args []string) ([]byte, er
 	//get data from middle layer
 	UserId := args[0]
 	KycDetails, _ = GetKYCDetails(stub, UserId)
-	JsonAsBytes, _ := json.Marshal(KycDetails)
+	KycList = append(KycList, KycDetails)
+	JsonAsBytes, _ := json.Marshal(KycList)
 
 	return JsonAsBytes, nil
 }
