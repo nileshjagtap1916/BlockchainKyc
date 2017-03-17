@@ -32,8 +32,11 @@ func SaveKycDetails(stub shim.ChaincodeStubInterface, args []string) ([]byte, er
 
 	//save data into blockchain
 	ok, err = InsertKYCDetails(stub, KycDetails)
-	if !ok && err == nil {
+	/*if !ok && err == nil {
 		return nil, errors.New("Error in adding KycDetails record.")
+	}*/
+	if !ok {
+		return nil, err
 	}
 
 	// Update Userlist with current UserId
