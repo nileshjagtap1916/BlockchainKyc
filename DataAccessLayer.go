@@ -32,6 +32,13 @@ func CreateDatabase(stub shim.ChaincodeStubInterface) error {
 		return errors.New("Failed creating BankDetails table.")
 	}
 
+	//Create Bank List
+	var BankList []string
+	jsonAsBytes, _ := json.Marshal(BankList)
+	err = stub.PutState("BankList", jsonAsBytes)
+	if err != nil {
+		return errors.New("Failed to put Bank List")
+	}
 	return nil
 }
 
@@ -49,13 +56,58 @@ func InsertKYCDetails(stub shim.ChaincodeStubInterface, Kycdetails KycData) (boo
 }
 
 func InsertBankDetails(stub shim.ChaincodeStubInterface, BankName string, UserList []string) (bool, error) {
+	var ok bool
+	var err error
+	var BankList []string
+
 	JsonAsBytes, _ := json.Marshal(UserList)
-	return stub.InsertRow("BankDetails", shim.Row{
+
+	ok, err = stub.InsertRow("BankDetails", shim.Row{
 		Columns: []*shim.Column{
 			&shim.Column{Value: &shim.Column_String_{String_: BankName}},
 			&shim.Column{Value: &shim.Column_Bytes{Bytes: JsonAsBytes}},
 		},
 	})
+	if !ok && err == nil {
+		return false, errors.New("Error in adding BankDetails record.")
+	}
+
+	BankList, err = GetBankList(stub)
+	if err != nil {
+		return false, err
+	}
+
+	//Update Bank List
+	BankList = append(BankList, BankName)
+
+	ok, err = PutBankList(stub, BankList)
+	if !ok {
+		return false, err
+	}
+
+	return true, nil
+
+}
+
+func GetBankList(stub shim.ChaincodeStubInterface) ([]string, error) {
+	// Get bank List
+	var BankList []string
+	jsonAsBytes, err := stub.GetState("BankList")
+	if err != nil {
+		return nil, errors.New("Failed to get Bank List")
+	}
+	json.Unmarshal(jsonAsBytes, &BankList)
+	return BankList, nil
+}
+
+func PutBankList(stub shim.ChaincodeStubInterface, BankList []string) (bool, error) {
+	//Put Bank List
+	jsonAsBytes, _ := json.Marshal(BankList)
+	err := stub.PutState("BankList", jsonAsBytes)
+	if err != nil {
+		return false, errors.New("Failed to put Bank List")
+	}
+	return true, nil
 }
 
 func GetKYCDetails(stub shim.ChaincodeStubInterface, UserId string) (KycData, error) {
