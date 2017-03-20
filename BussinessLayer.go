@@ -73,6 +73,33 @@ func SaveBankDetails(stub shim.ChaincodeStubInterface, args []string) ([]byte, e
 	return nil, nil
 }
 
+func GetAllKyc(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+	var KycList []KycData
+	var KycDetails KycData
+
+	if len(args) != 0 {
+		return nil, errors.New("Incorrect number of arguments. Need 0 argument")
+	}
+	BankList, err := GetBankList(stub)
+	if err != nil {
+		return nil, err
+	}
+
+	//get data from blockchain
+
+	for _, BankName := range BankList {
+		UserList, _ := GetUserList(stub, BankName)
+		for _, UserId := range UserList {
+			KycDetails, _ = GetKYCDetails(stub, UserId)
+			KycList = append(KycList, KycDetails)
+		}
+	}
+
+	JsonAsBytes, _ := json.Marshal(KycList)
+
+	return JsonAsBytes, nil
+}
+
 func GetKycByUserId(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 	var KycList []KycData
 	var KycDetails KycData
