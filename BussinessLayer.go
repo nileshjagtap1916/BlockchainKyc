@@ -21,6 +21,12 @@ func SaveKycDetails(stub shim.ChaincodeStubInterface, args []string) ([]byte, er
 		return nil, errors.New("Incorrect number of arguments. Need 4 argument")
 	}
 
+	//hardcoded KYC information
+	KycDetails.KYC_INFO_1 = "Kyc Information For Bank1"
+	KycDetails.KYC_INFO_2 = "Kyc Information For Bank2"
+	KycDetails.KYC_INFO_3 = "Kyc Information For Bank3"
+	KycDetails.KYC_INFO_4 = "Kyc Information For Bank4"
+
 	//get data from middle layer
 	KycDetails.USER_ID = args[0]
 	KycDetails.KYC_BANK_NAME = args[1]
