@@ -173,6 +173,10 @@ func UpdateKycDetails(stub shim.ChaincodeStubInterface, KycDetails KycData) (boo
 			&shim.Column{Value: &shim.Column_String_{String_: KycDetails.KYC_CREATE_DATE}},
 			&shim.Column{Value: &shim.Column_String_{String_: KycDetails.KYC_VALID_TILL_DATE}},
 			&shim.Column{Value: &shim.Column_String_{String_: KycDetails.KYC_DOC_BLOB}},
+			&shim.Column{Value: &shim.Column_String_{String_: KycDetails.KYC_INFO_1}},
+			&shim.Column{Value: &shim.Column_String_{String_: KycDetails.KYC_INFO_2}},
+			&shim.Column{Value: &shim.Column_String_{String_: KycDetails.KYC_INFO_3}},
+			&shim.Column{Value: &shim.Column_String_{String_: KycDetails.KYC_INFO_4}},
 		},
 	})
 }
