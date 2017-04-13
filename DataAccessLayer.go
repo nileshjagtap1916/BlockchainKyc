@@ -18,6 +18,10 @@ func CreateDatabase(stub shim.ChaincodeStubInterface) error {
 		&shim.ColumnDefinition{Name: "KYC_CREATE_DATE", Type: shim.ColumnDefinition_STRING, Key: false},
 		&shim.ColumnDefinition{Name: "KYC_VALID_TILL_DATE", Type: shim.ColumnDefinition_STRING, Key: false},
 		&shim.ColumnDefinition{Name: "KYC_DOC_BLOB", Type: shim.ColumnDefinition_STRING, Key: false},
+		&shim.ColumnDefinition{Name: "KYC_INFO_1", Type: shim.ColumnDefinition_STRING, Key: false},
+		&shim.ColumnDefinition{Name: "KYC_INFO_2", Type: shim.ColumnDefinition_STRING, Key: false},
+		&shim.ColumnDefinition{Name: "KYC_INFO_3", Type: shim.ColumnDefinition_STRING, Key: false},
+		&shim.ColumnDefinition{Name: "KYC_INFO_4", Type: shim.ColumnDefinition_STRING, Key: false},
 	})
 	if err != nil {
 		return errors.New("Failed creating KycDetails table.")
@@ -51,6 +55,10 @@ func InsertKYCDetails(stub shim.ChaincodeStubInterface, Kycdetails KycData) (boo
 			&shim.Column{Value: &shim.Column_String_{String_: Kycdetails.KYC_CREATE_DATE}},
 			&shim.Column{Value: &shim.Column_String_{String_: Kycdetails.KYC_VALID_TILL_DATE}},
 			&shim.Column{Value: &shim.Column_String_{String_: Kycdetails.KYC_DOC_BLOB}},
+			&shim.Column{Value: &shim.Column_String_{String_: Kycdetails.KYC_INFO_1}},
+			&shim.Column{Value: &shim.Column_String_{String_: Kycdetails.KYC_INFO_2}},
+			&shim.Column{Value: &shim.Column_String_{String_: Kycdetails.KYC_INFO_3}},
+			&shim.Column{Value: &shim.Column_String_{String_: Kycdetails.KYC_INFO_4}},
 		},
 	})
 }
@@ -129,6 +137,10 @@ func GetKYCDetails(stub shim.ChaincodeStubInterface, UserId string) (KycData, er
 	KycDataObj.KYC_CREATE_DATE = row.Columns[3].GetString_()
 	KycDataObj.KYC_VALID_TILL_DATE = row.Columns[4].GetString_()
 	KycDataObj.KYC_DOC_BLOB = row.Columns[5].GetString_()
+	KycDataObj.KYC_INFO_1 = row.Columns[6].GetString_()
+	KycDataObj.KYC_INFO_2 = row.Columns[7].GetString_()
+	KycDataObj.KYC_INFO_3 = row.Columns[8].GetString_()
+	KycDataObj.KYC_INFO_4 = row.Columns[9].GetString_()
 
 	return KycDataObj, nil
 }
