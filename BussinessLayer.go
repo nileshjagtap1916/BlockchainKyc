@@ -17,11 +17,12 @@ func SaveKycDetails(stub shim.ChaincodeStubInterface, args []string) ([]byte, er
 	var err error
 	var ok bool
 
-	if len(args) != 5 {
+	if len(args) != 4 {
 		return nil, errors.New("Incorrect number of arguments. Need 4 argument")
 	}
 
-	//hardcoded KYC information	
+	//hardcoded KYC information
+	KycDetails.KYC_INFO_1 = "Kyc Information For Bank1"
 	KycDetails.KYC_INFO_2 = "Kyc Information For Bank2"
 	KycDetails.KYC_INFO_3 = "Kyc Information For Bank3"
 	KycDetails.KYC_INFO_4 = "Kyc Information For Bank4"
@@ -31,7 +32,6 @@ func SaveKycDetails(stub shim.ChaincodeStubInterface, args []string) ([]byte, er
 	KycDetails.KYC_BANK_NAME = args[1]
 	KycDetails.USER_NAME = args[2]
 	KycDetails.KYC_DOC_BLOB = args[3]
-	KycDetails.KYC_INFO_1 = args[4]
 	CurrentDate := time.Now().Local()
 	KycDetails.KYC_CREATE_DATE = CurrentDate.Format("02 Jan 2006")
 	KycDetails.KYC_VALID_TILL_DATE = CurrentDate.AddDate(2, 0, -1).Format("02 Jan 2006")
