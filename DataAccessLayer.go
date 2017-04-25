@@ -120,8 +120,9 @@ func PutBankList(stub shim.ChaincodeStubInterface, BankList []string) (bool, err
 
 func GetKYCDetails(stub shim.ChaincodeStubInterface, UserId string) (KycData, error) {
 	var KycDataObj KycData
-
+	var BankList []string
 	var columns []shim.Column
+	var err error
 
 	col1 := shim.Column{Value: &shim.Column_String_{String_: UserId}}
 	columns = append(columns, col1)
@@ -137,11 +138,24 @@ func GetKYCDetails(stub shim.ChaincodeStubInterface, UserId string) (KycData, er
 	KycDataObj.KYC_CREATE_DATE = row.Columns[3].GetString_()
 	KycDataObj.KYC_VALID_TILL_DATE = row.Columns[4].GetString_()
 	KycDataObj.KYC_DOC_BLOB = row.Columns[5].GetString_()
-	KycDataObj.KYC_INFO_1 = row.Columns[6].GetString_()
+	/*KycDataObj.KYC_INFO_1 = row.Columns[6].GetString_()
 	KycDataObj.KYC_INFO_2 = row.Columns[7].GetString_()
 	KycDataObj.KYC_INFO_3 = row.Columns[8].GetString_()
-	KycDataObj.KYC_INFO_4 = row.Columns[9].GetString_()
+	KycDataObj.KYC_INFO_4 = row.Columns[9].GetString_()*/
+	BankList, err = GetBankList(stub)
+	if err != nil {
+		return KycDataObj, err
+	}
 
+	if KycDataObj.KYC_BANK_NAME == BankList[0] {
+		KycDataObj.KYC_INFO_1 = row.Columns[6].GetString_()
+	} else if KycDataObj.KYC_BANK_NAME == BankList[1]{
+		KycDataObj.KYC_INFO_2 = row.Columns[7].GetString_()
+	} else if KycDataObj.KYC_BANK_NAME == BankList[2]{
+		KycDataObj.KYC_INFO_3 = row.Columns[8].GetString_()
+	} else if KycDataObj.KYC_BANK_NAME == BankList[3]{
+		KycDataObj.KYC_INFO_4 = row.Columns[9].GetString_()
+	}
 	return KycDataObj, nil
 }
 
