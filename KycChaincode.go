@@ -47,7 +47,7 @@ func (t *KycChaincode) Invoke(stub shim.ChaincodeStubInterface, function string,
 // Query callback representing the query of a chaincode
 func (t *KycChaincode) Query(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
 
-	// Handle different functions
+	// Handle different functions of KnowYourCust 
 	if function == "GetAllKyc" {
 		// get User's KYC data by UserId from blockchain
 		return GetAllKyc(stub, args)
